@@ -31,6 +31,13 @@ bool TerminalResized()
     return height != Console.WindowHeight - 1 || width != Console.WindowWidth - 5;
 }
 
+bool ConsumedFood()
+{
+    bool consumed = (playerX, playerY) == (foodX, foodY);
+    if (consumed) player = states[food];
+    return consumed;
+}
+
 InitializeGame();
 while (!shouldExit) 
 {
@@ -40,9 +47,13 @@ while (!shouldExit)
         shouldExit = true;
         break;
     }
+    if (ConsumedFood()) {
+        ChangePlayer();
+        ShowFood();
+    }
     Move(earlyExit);
+  
 }
-
 
 
 // Displays random food at a random location
