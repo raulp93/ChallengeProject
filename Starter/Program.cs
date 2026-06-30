@@ -5,7 +5,9 @@ Console.CursorVisible = false;
 int height = Console.WindowHeight - 1;
 int width = Console.WindowWidth - 5;
 bool shouldExit = false;
+
 bool earlyExit = false;
+bool enableSpeedChange = false;
 
 // Console position of the player
 int playerX = 0;
@@ -16,8 +18,8 @@ int foodX = 0;
 int foodY = 0;
 
 // Available player and food strings
-string[] states = {"('-')", "(^-^)", "(X_X)"};
-string[] foods = {"@@@@@", "$$$$$", "#####"};
+string[] states = {".('-').", "l(^-^)l", "t(X_X).", "t(-_-)t"};
+string[] foods = {"@@@@@@@", "$$$$$$$", "#######", "%%%%%%%"};
 
 // Current player string displayed in the Console
 string player = states[0];
@@ -38,6 +40,12 @@ bool ConsumedFood()
     return consumed;
 }
 
+void ShouldFreeze()
+{
+    if (player == "t(X_X).") 
+        FreezePlayer();
+}
+
 InitializeGame();
 while (!shouldExit) 
 {
@@ -50,6 +58,8 @@ while (!shouldExit)
     if (ConsumedFood()) {
         ChangePlayer();
         ShowFood();
+        ShouldFreeze();
+        
     }
     Move(earlyExit);
   
@@ -91,20 +101,23 @@ void Move(bool earlyExit)
 {
     int lastX = playerX;
     int lastY = playerY;
-    
+
+    int speed = (player == "l(^-^)l" && enableSpeedChange) ? 3 : 1;
+  
+   
     switch (Console.ReadKey(true).Key) 
     {
         case ConsoleKey.UpArrow:
-            playerY--; 
+            playerY -= speed; 
             break;
 		case ConsoleKey.DownArrow: 
-            playerY++; 
+            playerY += speed; 
             break;
 		case ConsoleKey.LeftArrow:  
-            playerX--; 
+            playerX -= speed; 
             break;
 		case ConsoleKey.RightArrow: 
-            playerX++; 
+            playerX += speed; 
             break;
 		case ConsoleKey.Escape:     
             shouldExit = true; 
@@ -125,6 +138,7 @@ void Move(bool earlyExit)
     // Keep player position within the bounds of the Terminal window
     playerX = (playerX < 0) ? 0 : (playerX >= width ? width : playerX);
     playerY = (playerY < 0) ? 0 : (playerY >= height ? height : playerY);
+
 
     // Draw the player at the new location
     Console.SetCursorPosition(playerX, playerY);
